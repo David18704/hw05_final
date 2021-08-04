@@ -1,0 +1,34 @@
+    {% extends "base.html" %}
+    {% block title %}Последние новости{% endblock %}
+    {% block header %}Последние новости
+    
+    <a if request.user.is_authenticated(): href="/new/">
+      <strong class="d-block text-gray-dark">Новая запись</strong>
+    </a> {% endblock %}
+
+    {% block content %}
+      {% include "posts/menu.html" with index=True %}
+      {% load cache %}
+      {% cache 60 index_page %}
+      {% for post in page %}
+        <h3>
+          Автор: {{ post.author.get_full_name }}, Дата публикации: {{ post.pub_date|date:"d M Y" }}
+        </h3>
+    
+        <a class="btn btn-sm btn-primary" href="{% url 'add_comment' user post.id %}" role="button">
+          Добавить комментарий
+        </a>
+        <a class="btn btn-sm btn-info" href="{% url 'post_edit' user post.id %}" role="button">          
+          Редактировать
+        </a>
+
+        {% include "posts/post_item.html" with post=post %}
+     
+    
+      {% endfor %}
+      {% endcache %}
+
+      {% include "paginator.html" with items=page paginator=paginator%}
+
+    {% endblock %}
+ 

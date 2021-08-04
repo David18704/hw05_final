@@ -1,0 +1,90 @@
+{% extends "base.html" %} 
+{% block title %}Последние обновления на сайте{% endblock %} 
+{% block header %}{% endblock %} 
+{% block content %} 
+ 
+ 
+ 
+  <main role="main" class="container"> 
+    <div class="row"> 
+      <div class="col-md-3 mb-3 mt-1"> 
+        <div class="card"> 
+          <div class="card-body"> 
+            <div class="h2"> 
+              <!-- Имя автора --> 
+              {{ user }} 
+            </div> 
+            <div class="h3 text-muted"> 
+              <!-- username автора --> 
+              {{ user.get_full_name }} 
+            </div> 
+          </div> 
+          <ul class="list-group list-group-flush"> 
+            <li class="list-group-item"> 
+              <div class="h6 text-muted"> 
+                Подписчиков: XXX <br> 
+                Подписан: XXX 
+                
+              </div> 
+            </li> 
+            <li class="list-group-item"> 
+              <div class="h6 text-muted"> 
+                <!-- Количество записей --> 
+                Записей: {{ posts.count }} 
+              </div> 
+            </li> 
+          </ul> 
+        </div> 
+      </div> 
+   
+      <div class="col-md-9"> 
+        <!-- Начало блока с отдельным постом --> 
+         
+        <div class="card mb-3 mt-1 shadow-sm"> 
+         
+
+          <div class="card-body"> 
+            <p class="card-text"> 
+              
+              
+              <!-- Ссылка на страницу автора в атрибуте href;
+                 <a href="{% url 'profile' user %}">  
+                <strong class="d-block text-gray-dark">{{user}}</strong>  
+              </a> username автора в тексте ссылки --> 
+
+             
+              <!-- Текст поста --> 
+                 {% include "posts/post_item.html" with post=message %}
+                </p>
+              <div class="d-flex justify-content-between align-items-center"> 
+                <div class="btn-group "> 
+                  <!-- Ссылка на страницу записи в атрибуте href--> 
+              
+                </p>
+                <h3> 
+                  Автор: {{ message.author.get_full_name }} 
+                </h3> 
+                </div> 
+              
+              {% if not forloop.last %}<hr>{% endif %}
+             
+            </p> 
+                
+              <!-- Дата публикации  --> 
+               
+              <small class="text-muted">Дата публикации: {{ message.pub_date|date:"d M Y" }}</small> 
+               
+            </div> 
+             
+          </div> 
+        </div> 
+          
+        <small class="text-muted">{% now "N, j, Y" %}</small> 
+        {% include "posts/comments.html" %}  
+        {% endblock %} 
+
+       
+ 
+      </div> 
+    </div> 
+  </main> 

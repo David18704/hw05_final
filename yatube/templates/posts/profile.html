@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Последние обновления на сайте{% endblock %}
+{% block header %}{% endblock %}
+{% block content %}
+
+
+
+  <main role="main" class="container">
+    <div class="row">
+      <div class="col-md-3 mb-3 mt-1">
+        <div class="card">
+          <div class="card-body">
+          
+      
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <div class="h6 text-muted">
+                Подписчиков: {{signatory.count}} <br>
+                Подписан: {{follower.count}}
+              </div>
+            </li>
+            <li class="list-group-item">
+              <div class="h6 text-muted">
+                <!-- Количество записей -->
+                Записей: {{ posts.count }}
+              </div>
+            </li>
+            
+            <li class="list-group-item">
+              
+              {% if following %}
+                <a
+                  class="btn btn-lg btn-light"
+                  if request.user.is_authenticated(): href="{% url 'profile_unfollow' author %}" role="button">
+                  Отписаться
+                </a>
+              {% else %}
+                <a
+                  class="btn btn-lg btn-primary" 
+                  if request.user.is_authenticated(): href="{% url 'profile_follow' author %}" role="button">
+                  Подписаться
+                </a>
+              {% endif %}
+              </li>
+
+          </ul>
+        </div>
+      </div>
+  
+      <div class="col-md-9">
+        <!-- Начало блока с отдельным постом -->
+        {% for post in page %}
+        <div class="card mb-3 mt-1 shadow-sm">
+
+          <div class="card-body">
+            <p class="card-text">
+              <!-- Ссылка на страницу автора в атрибуте href; username автора в тексте ссылки -->
+ 
+              <!-- Текст поста -->
+            <div class="d-flex justify-content-between align-items-center"></div> 
+             <div class="btn-group ">
+              <h6>
+                Автор: {{ post.author.get_full_name }}
+              </h6>
+              {% include "posts/post_item.html" with post=post %}
+            </p>
+          </div>
+                <!-- Ссылка на страницу записи в атрибуте href-->
+      
+              
+              <!-- Дата публикации <small class="text-muted">Дата публикации: {{ post.pub_date|date:"d M Y" }}</small>   -->         
+              {% if not forloop.last %}<hr>{% endif %}  
+            
+            
+          </div>
+        </div>
+        {% endfor %}
+        {% include "paginator.html" %}
+        <small class="text-muted">{% now "N, j, Y" %}</small>
+        {% endblock %}
+        <!-- Конец блока с отдельным постом -->
+        <!-- Остальные посты -->
+        <!-- Здесь постраничная навигация паджинатора -->
+      </div>
+    </div>
+  </main>
+ 
