@@ -10,13 +10,13 @@ import shutil
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 
+
 @override_settings(MEDIA_ROOT='foo/bar/')
 class PostCreateFormTests(TestCase):
     @classmethod
-  
     def setUpClass(cls):
         super().setUpClass()
-            
+
         cls.reader_user = User.objects.create_user(username='admin1')
         cls.writer_user = User.objects.create_user(username='admin2')
         cls.group = Group.objects.create(
@@ -41,24 +41,20 @@ class PostCreateFormTests(TestCase):
             text='Тестовый текст',
             author=PostCreateFormTests.writer_user,
             group=PostCreateFormTests.group,
-            image=uploaded,
-            )
-    
-    
+            image=uploaded)
+
     @classmethod
     def tearDownClass(cls):
         shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
         super().tearDownClass()
-    
+
     def setUp(self):
         self.authorized_client = Client()
         self.authorized_client.force_login(PostCreateFormTests.writer_user)
 
-    
+
     def test_image_index(self):
-        response = self.authorized_client.get(
-            reverse('index'))
-     
+        response = self.authorized_client.get(reverse('index'))
         self.assertTrue(
             Post.objects.filter(
                 text='Тестовый текст',
@@ -67,38 +63,37 @@ class PostCreateFormTests(TestCase):
                 image='posts/small.gif'
             ).exists()
         )
-    
+
     def test_image_profile(self):
         response = self.authorized_client.get(
-           reverse('profile', kwargs={'username': 'admin2'}))
-        
+            reverse('profile', kwargs={'username': 'admin2'}))
+
         self.assertTrue(
             Post.objects.filter(
                 text='Тестовый текст',
                 group=PostCreateFormTests.group.id,
                 author=PostCreateFormTests.writer_user,
-                image= 'posts/small.gif'
+                image='posts/small.gif'
             ).exists()
         )
-        
-    
+
     def test_image_group_posts(self):
         response = self.authorized_client.get(
-        reverse('group_posts', kwargs={'slug': 'test_group'}))
-        
+            reverse('group_posts', kwargs={'slug': 'test_group'}))
+      
         self.assertTrue(
             Post.objects.filter(
                 text='Тестовый текст',
                 group=PostCreateFormTests.group.id,
                 author=PostCreateFormTests.writer_user,
-                image= 'posts/small.gif'
+                image='posts/small.gif'
             ).exists()
         )
-    
+
     def test_image_post(self):
         response = self.authorized_client.get(
             reverse('post', kwargs={'username': 'admin2', 'post_id': '1'}))
-        
+
         self.assertTrue(
             Post.objects.filter(
                 text='Тестовый текст',
