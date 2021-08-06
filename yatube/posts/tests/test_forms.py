@@ -188,9 +188,10 @@ class PostCreateFormTests(TestCase):
             follow=True
         )
 
-        self.assertRedirects(response,
-            reverse('post', kwargs={'username': 'admin2','post_id': 1})
-            )
+        self.assertRedirects(response, 
+                             reverse('post', kwargs={'username': 'admin2', 
+                                                     'post_id': 1})
+                                     )
         self.assertTrue(
             Post.objects.filter(
                 text='Измененный текст',
@@ -211,9 +212,10 @@ class PostCreateFormTests(TestCase):
             follow=True
         )
 
-        self.assertRedirects(response, 
-            reverse('post', kwargs={'username': 'admin2','post_id': 1})
-            )
+        self.assertRedirects(response, reverse('post',
+                                               kwargs={'username': 'admin2', 
+                                               'post_id': 1})
+                                              )
         self.assertTrue(
             Post.objects.filter(
                 text='Вторично измененный текст',
