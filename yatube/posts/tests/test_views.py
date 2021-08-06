@@ -274,6 +274,7 @@ class FollowsTests(TestCase):
                                                data=form_data,
                                                follow=True)
         self.assertEqual(Comment.objects.count(), comment_count + 1)
+        
         self.assertEqual(response.context['post_id'], 1)   # данный ассерт 
         #применен для того, чтобы при отправке проекта на ревью обойти проверку
         #  flake8 на неиспользуемую переменную response
