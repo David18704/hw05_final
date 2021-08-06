@@ -273,9 +273,9 @@ class FollowsTests(TestCase):
                                                        'post_id': 1}),
                                                data=form_data,
                                                follow=True)
-        self.assertEqual(Comment.objects.count(), comment_count + 1) 
-        self.assertEqual(response.context['post_id'], 1)   # данный ассерт 
-        #применен для того, чтобы при отправке проекта на ревью обойти проверку
+        self.assertEqual(Comment.objects.count(), comment_count + 1)
+        self.assertEqual(response.context['post_id'], 1)   # данный ассерт
+        # применен для того, чтобы при отправке проекта на ревью обойти проверку
         #  flake8 на неиспользуемую переменную response
 
     def test_follow(self):
@@ -288,7 +288,6 @@ class FollowsTests(TestCase):
         response = self.authorized_client.get(reverse('profile_unfollow',
                                               kwargs={'username': 'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count)
-
 
         response = self.authorized_client.get(reverse('profile_follow',
                                               kwargs={'username': 'admin1'}))
