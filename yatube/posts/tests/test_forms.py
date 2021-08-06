@@ -207,7 +207,7 @@ class PostCreateFormTests(TestCase):
         )
 
         self.assertRedirects(response, reverse('post',
-                             kwargs={'username': 'admin2','post_id': 1})
+                             kwargs={'username': 'admin2', 'post_id': 1})
                              )
         self.assertTrue(
             Post.objects.filter(
