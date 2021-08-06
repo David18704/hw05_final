@@ -272,13 +272,6 @@ class FollowsTests(TestCase):
             'text': 'Комментарий',
         }
 
-        response = self.guest_client.post(reverse('add_comment',
-                                          kwargs={'username': 'admin1',
-                                                  'post_id': 1}),
-                                          data=form_data,
-                                          follow=True)
-        self.assertEqual(Comment.objects.count(), comment_count)
-
         response = self.authorized_client.post(reverse('add_comment',
                                                kwargs={'username': 'admin1',
                                                        'post_id': 1}),
