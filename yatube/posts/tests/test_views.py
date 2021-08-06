@@ -255,18 +255,21 @@ class FollowsTests(TestCase):
         self.authorized_client.force_login(self.user)
         cache.clear()
 
-    def test_signatore(self):
+    def test_signatore_follow(self):
         follow_count = Follow.objects.count()
 
         response = self.authorized_client.get(reverse('profile_follow',
                                               kwargs={'username': 'admin2'})) 
         self.assertEqual(Follow.objects.count(), follow_count + 1)
+    
+    def test_signatore_unfollow(self):
+        follow_count = Follow.objects.count()
 
         response = self.authorized_client.get(reverse('profile_unfollow', 
                                               kwargs={'username': 'admin2'})) 
         self.assertEqual(Follow.objects.count(), follow_count)
 
-    def test_comment(self):
+    def test_comment_guest(self):
         comment_count = Comment.objects.count()
         form_data = {
             'text': 'Комментарий',
@@ -278,6 +281,12 @@ class FollowsTests(TestCase):
                                           data=form_data,
                                           follow=True)
         self.assertEqual(Comment.objects.count(), comment_count)
+    
+    def test_comment_authorized(self):
+        comment_count = Comment.objects.count()
+        form_data = {
+            'text': 'Комментарий',
+        }
 
         response = self.authorized_client.post(reverse('add_comment',
                                                kwargs={'username': 'admin1', 'post_id': 1}),
@@ -296,8 +305,10 @@ class FollowsTests(TestCase):
                                                       kwargs={'username': 'admin2'})) 
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
-        response = self.authorized_client.get(reverse('profile_follow',
-                                                      kwargs={'username': 'admin2'})) 
+        response = self.authorized_client.get(reverse
+                                             ('profile_follow',
+                                              kwargs={'username': 'admin2'})
+                                              )
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
         Post.objects.create(text="тест для  подписки",
