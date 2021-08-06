@@ -11,7 +11,7 @@ class PostModelTest(TestCase):
             first_name='David',
             last_name='Elchaninov',
             username='admin1',
-        )          
+        )
         cls.post = Post.objects.create(
             text='Тестовый текст',
             author=PostModelTest.user,

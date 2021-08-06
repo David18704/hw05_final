@@ -17,10 +17,11 @@ class GroupAdmin(admin.ModelAdmin):
     list_filter = ("description",)
     empty_value_display = "-пусто-"
 
+
 class FollowAdmin(admin.ModelAdmin):
-  
+
     search_fields = ("title",)
-   
+
     empty_value_display = "-пусто-"
 
 

@@ -18,9 +18,9 @@ def index(request):
     paginator = Paginator(posts, settings.POSTS_PER_PAGE)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, 'posts/index.html', {'page': page, 
+    return render(request, 'posts/index.html', {'page': page,
                   'comments': comments, 'posts': posts}
-                 )
+                  )
 
 
 @require_http_methods(['GET'])
@@ -32,7 +32,7 @@ def group_posts(request, slug):
     page = paginator.get_page(page_number)
     return render(request, 'posts/group.html', {'group': group,
                                                 'posts': posts, 'page': page}
-                 )
+                  )
 
 
 @require_http_methods(['GET'])
@@ -52,8 +52,9 @@ def profile(request, username):
     page = paginator.get_page(page_number)
 
     return render(request, 'posts/profile.html',
-                  {'author': author, 'page': page, 'signatory': signatory, 
-                   'follower': follower, 'following': following, 'posts': posts}
+                  {'author': author, 'page': page, 'signatory': signatory,
+                   'follower': follower, 'following': following,
+                   'posts': posts}
                   )
 
 
@@ -90,7 +91,7 @@ def post_edit(request, username, post_id):
 
     if request.user.username != username:
         return redirect("post", username=post.author, post_id=post_id)
-    form = PostForm(request.POST or None, files=request.FILES or None, 
+    form = PostForm(request.POST or None, files=request.FILES or None,
                     instance=post)
     if form.is_valid():
         post = form.save(commit=False)
@@ -125,7 +126,7 @@ def add_comment(request, username, post_id):
             form.save()
             return redirect('post', username, post_id)
     form = CommentForm()
-    return render(request, 'posts/comments.html', {'form': form, 
+    return render(request, 'posts/comments.html', {'form': form,
                                                    'post_id': post_id})
 
 
