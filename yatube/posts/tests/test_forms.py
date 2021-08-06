@@ -52,7 +52,6 @@ class PostCreateFormTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(PostCreateFormTests.writer_user)
 
-
     def test_image_index(self):
         response = self.authorized_client.get(reverse('index'))
         self.assertTrue(
@@ -80,7 +79,7 @@ class PostCreateFormTests(TestCase):
     def test_image_group_posts(self):
         response = self.authorized_client.get(
             reverse('group_posts', kwargs={'slug': 'test_group'}))
-      
+
         self.assertTrue(
             Post.objects.filter(
                 text='Тестовый текст',
@@ -124,7 +123,7 @@ class PostCreateFormTests(TestCase):
                 text='Тестовый текст',
                 group=PostCreateFormTests.group.id,
                 author=PostCreateFormTests.writer_user,
-                image = 'posts/small.gif'
+                image='posts/small.gif'
             ).exists()
         )
 
@@ -209,8 +208,8 @@ class PostCreateFormTests(TestCase):
 
         self.assertRedirects(response, reverse('post',
                                                kwargs={'username': 'admin2',
-                                              'post_id': 1})
-                                               )
+                                               'post_id': 1})
+                             )
         self.assertTrue(
             Post.objects.filter(
                 text='Вторично измененный текст',

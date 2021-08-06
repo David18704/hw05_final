@@ -273,14 +273,14 @@ class FollowsTests(TestCase):
         }
 
         response = self.guest_client.post(reverse('add_comment',
-                                                  kwargs={'username': 'admin1',
-                                                  'post_id': 1}),
+                                          kwargs={'username': 'admin1','post_id': 1}),
                                           data=form_data,
                                           follow=True)
         self.assertEqual(Comment.objects.count(), comment_count)
 
         response = self.authorized_client.post(reverse('add_comment',
-                                               kwargs={'username': 'admin1', 'post_id': 1}),
+                                               kwargs={'username': 'admin1', 
+                                                       'post_id': 1}),
                                                data=form_data,
                                                follow=True)
         self.assertEqual(Comment.objects.count(), comment_count + 1)
@@ -293,8 +293,7 @@ class FollowsTests(TestCase):
         assert FollowsTests.user.follower.count() == 0
 
         response = self.authorized_client.get(reverse('profile_follow',
-                                                      kwargs={'username': 
-                                                      'admin2'}))
+                                              kwargs={'username': 'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
         response = self.authorized_client.get(reverse('profile_follow',

@@ -102,7 +102,7 @@ class StaticURLTests(TestCase):
         response = self.guest_client.get('/admin1/1/edit/', follow=True)
         self.assertRedirects(
             response, '/auth/login/?next=/admin1/1/edit/')
-            
+
         response = self.authorized_client.get('/admin2/2/edit/', follow=True)
         self.assertRedirects(
             response, '/admin2/2/')
@@ -147,12 +147,13 @@ class FollowsTests(TestCase):
 
     def test_signatore(self):
         follow_count = Follow.objects.count()
-        response = self.authorized_client.get(reverse('profile_follow', kwargs={'username': 'admin2'})) 
-        self.assertEqual(Follow.objects.count(), follow_count+1)
+        response = self.authorized_client.get(reverse('profile_follow', 
+                                              kwargs={'username': 'admin2'})) 
+        self.assertEqual(Follow.objects.count(), follow_count + 1)
 
-        response = self.authorized_client.get(reverse('profile_unfollow', kwargs={'username': 'admin2'})) 
+        response = self.authorized_client.get(reverse('profile_unfollow',
+                                              kwargs={'username': 'admin2'})) 
         self.assertEqual(Follow.objects.count(), follow_count)
-
 
     def test_comment(self):
         comment_count = Comment.objects.count()
@@ -160,12 +161,15 @@ class FollowsTests(TestCase):
             'text': 'Комментарий',
         }
 
-        response = self.guest_client.post(reverse('add_comment', kwargs={'username': 'admin1', 'post_id': 1}),
-                                               data=form_data,
-                                               follow=True)
+        response = self.guest_client.post(reverse('add_comment', 
+                                          kwargs={'username': 'admin1', 'post_id': 1}),
+                                          data=form_data,
+                                          follow=True)
         self.assertEqual(Comment.objects.count(), comment_count)
 
-        response = self.authorized_client.post(reverse('add_comment', kwargs={'username': 'admin1', 'post_id': 1}),
+        response = self.authorized_client.post(reverse('add_comment', 
+                                               kwargs={'username': 'admin1', 
+                                                       'post_id': 1}),
                                                data=form_data,
                                                follow=True)
         self.assertEqual(Comment.objects.count(), comment_count + 1)
@@ -173,12 +177,12 @@ class FollowsTests(TestCase):
     def test_follow(self):
         follow_count = Follow.objects.count()
 
-        response = self.authorized_client.get(reverse('profile_follow', 
+        response = self.authorized_client.get(reverse('profile_follow',
                                               kwargs={'username': 'admin1'}))
         self.assertEqual(Follow.objects.count(), follow_count)
 
         response = self.authorized_client.get(reverse('profile_follow',
-                                                      kwargs={'username': 'admin2'}))
+                                              kwargs={'username': 'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
         Post.objects.create(text="тест для  подписки",
