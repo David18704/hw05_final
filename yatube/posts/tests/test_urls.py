@@ -14,6 +14,7 @@ class StaticURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
+
         cls.user = User.objects.create(
             first_name='David',
             last_name='Elchaninov',
@@ -101,6 +102,7 @@ class StaticURLTests(TestCase):
         response = self.guest_client.get('/admin1/1/edit/', follow=True)
         self.assertRedirects(
             response, '/auth/login/?next=/admin1/1/edit/')
+            
         response = self.authorized_client.get('/admin2/2/edit/', follow=True)
         self.assertRedirects(
             response, '/admin2/2/')
@@ -108,7 +110,10 @@ class StaticURLTests(TestCase):
     def test_url_not_found(self):
         response = self.guest_client.get('/404/')
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+
 class FollowsTests(TestCase):
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -144,6 +149,7 @@ class FollowsTests(TestCase):
         follow_count = Follow.objects.count()
         response = self.authorized_client.get(reverse('profile_follow', kwargs={'username': 'admin2'})) 
         self.assertEqual(Follow.objects.count(), follow_count+1)
+
         response = self.authorized_client.get(reverse('profile_unfollow', kwargs={'username': 'admin2'})) 
         self.assertEqual(Follow.objects.count(), follow_count)
 
@@ -153,10 +159,12 @@ class FollowsTests(TestCase):
         form_data = {
             'text': 'Комментарий',
         }
+
         response = self.guest_client.post(reverse('add_comment', kwargs={'username': 'admin1', 'post_id': 1}),
                                                data=form_data,
                                                follow=True)
         self.assertEqual(Comment.objects.count(), comment_count)
+
         response = self.authorized_client.post(reverse('add_comment', kwargs={'username': 'admin1', 'post_id': 1}),
                                                data=form_data,
                                                follow=True)

@@ -7,7 +7,6 @@ from posts.models import Post, Group, User
 from posts.forms import PostForm
 
 import shutil
-import tempfile
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 
@@ -17,8 +16,7 @@ class PostCreateFormTests(TestCase):
   
     def setUpClass(cls):
         super().setUpClass()
-        
-        
+            
         cls.reader_user = User.objects.create_user(username='admin1')
         cls.writer_user = User.objects.create_user(username='admin2')
         cls.group = Group.objects.create(
@@ -117,6 +115,7 @@ class PostCreateFormTests(TestCase):
             'group': PostCreateFormTests.group.id,
             'image': 'posts/small.gif',
         }
+
         response = self.authorized_client.post(
             reverse('new_post'),
             data=form_data,
@@ -140,6 +139,7 @@ class PostCreateFormTests(TestCase):
             'text': 'Тестовый текст',
             'group': PostCreateFormTests.group.id
         }
+
         response = self.authorized_client.post(
             reverse('new_post'),
             data=form_data,
@@ -161,11 +161,13 @@ class PostCreateFormTests(TestCase):
             'text': 'Тестовый текст2',
             'group': ''
         }
+
         response = self.authorized_client.post(
             reverse('new_post'),
             data=form_data,
             follow=True
         )
+
         self.assertRedirects(response, reverse('index'))
         self.assertEqual(Post.objects.count(), posts_count_new + 1)
         self.assertTrue(
@@ -202,6 +204,7 @@ class PostCreateFormTests(TestCase):
             'text': 'Вторично измененный текст',
             'group': ''
         }
+
         response = self.authorized_client.post(
             reverse('post_edit', kwargs={'username': 'admin2', 'post_id': 1}),
             data=form_data,
@@ -218,7 +221,3 @@ class PostCreateFormTests(TestCase):
                 group__isnull=True
             ).exists()
         )
-
-
-
-

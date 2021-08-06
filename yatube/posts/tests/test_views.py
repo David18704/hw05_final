@@ -1,7 +1,6 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django import forms
-#from django.views.decorators.cache import cache_page
 from django.core.cache import cache
 
 
@@ -132,6 +131,7 @@ class GrouppagesTests(TestCase):
     def test_home_page_correct_context(self):
         response = self.authorized_client.get(reverse('index'))
         first_object = response.context['page'].object_list[0]
+        
         self.assertEqual(first_object.text, 'Тестовый текст')
         self.assertEqual(first_object.author.username, 'admin1')
         self.assertEqual(first_object.group.title, 'Тест')
@@ -152,6 +152,7 @@ class GrouppagesTests(TestCase):
     def test_username_post_correct_context(self):
         response = self.authorized_client.get(
             reverse('post', kwargs={'username': 'admin1', 'post_id': '1'}))
+
         self.assertEqual(response.context['user'].username, 'admin1')
         self.assertEqual(response.context['post_id'], 1)
 
@@ -167,6 +168,7 @@ class GrouppagesTests(TestCase):
         response = self.authorized_client.get(
             reverse('group_posts', kwargs={'slug': 'Test'})
         )
+
         self.assertEqual(response.context['group'].title, 'Тест')
         self.assertEqual(response.context['group'].description, 'Test')
         self.assertEqual(response.context['group'].slug, 'Test')
@@ -205,28 +207,22 @@ class CacheTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
         cache.clear()
-
-    #cache_page(60 * 15)
+    
     def test_cache_index(self):
-	
-	    #CacheTest.post.delete()
-        #self.assertTrue(response.context['page'][0])
         Post.objects.create(text="тест для  кэша",author=CacheTests.user),
         response = self.authorized_client.get(reverse('index'))
         self.assertEqual(len(response.context["page"].object_list), 2)
+
         first_object = response.context['page'].object_list[0]
         self.assertEqual(first_object.text, 'тест для  кэша')
+
         CacheTests.post.delete()
-        #self.assertTrue(response.context['page'][0])
         self.assertEqual(len(response.context["page"].object_list), 2)
         cache.clear()
+
         response = self.authorized_client.get(reverse('index'))
-        #self.assertTrue(response.context['page'][0])
-        #CacheTests.post.delete()
-        #first_object.delete()
-        #self.assertTrue(response.context['page'][0])
         self.assertEqual(len(response.context["page"].object_list), 1)
-        #first_object.delete()
+
 
 class FollowsTests(TestCase):
     @classmethod
@@ -262,8 +258,10 @@ class FollowsTests(TestCase):
 
     def test_signatore(self):
         follow_count = Follow.objects.count()
+
         response = self.authorized_client.get(reverse('profile_follow', kwargs={'username': 'admin2'})) 
         self.assertEqual(Follow.objects.count(), follow_count+1)
+
         response = self.authorized_client.get(reverse('profile_unfollow', kwargs={'username': 'admin2'})) 
         self.assertEqual(Follow.objects.count(), follow_count)
 
@@ -273,10 +271,12 @@ class FollowsTests(TestCase):
         form_data = {
             'text': 'Комментарий',
         }
+
         response = self.guest_client.post(reverse('add_comment', kwargs={'username': 'admin1', 'post_id': 1}),
                                                data=form_data,
                                                follow=True)
         self.assertEqual(Comment.objects.count(), comment_count)
+
         response = self.authorized_client.post(reverse('add_comment', kwargs={'username': 'admin1', 'post_id': 1}),
                                                data=form_data,
                                                follow=True)
@@ -301,11 +301,3 @@ class FollowsTests(TestCase):
         Post.objects.create(text="тест для  подписки",author=FollowsTests.another_user),
         response = self.authorized_client.get(reverse('follow_index'))
         self.assertEqual(len(response.context['page'].object_list),1)
-        
-        
-        
-
-
-
-        
-
