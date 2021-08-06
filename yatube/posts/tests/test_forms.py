@@ -104,10 +104,10 @@ class PostCreateFormTests(TestCase):
                 text='Тестовый текст',
                 group=PostCreateFormTests.group.id,
                 author=PostCreateFormTests.writer_user,
-                image= 'posts/small.gif'
+                image='posts/small.gif'
             ).exists()
         )
-   
+
     def test_image_new_post(self):
         posts_count = Post.objects.count()
         form_data = {
@@ -119,7 +119,7 @@ class PostCreateFormTests(TestCase):
         response = self.authorized_client.post(
             reverse('new_post'),
             data=form_data,
-            
+
             follow=True
         )
         self.assertRedirects(response, reverse('index'))
@@ -129,7 +129,7 @@ class PostCreateFormTests(TestCase):
                 text='Тестовый текст',
                 group=PostCreateFormTests.group.id,
                 author=PostCreateFormTests.writer_user,
-                image= 'posts/small.gif'
+                image = 'posts/small.gif'
             ).exists()
         )
 
@@ -188,10 +188,10 @@ class PostCreateFormTests(TestCase):
             follow=True
         )
 
-        self.assertRedirects(response, 
-                             reverse('post', kwargs={'username': 'admin2', 
+        self.assertRedirects(response,
+                             reverse('post', kwargs={'username': 'admin2',
                                                      'post_id': 1})
-                                     )
+                             )
         self.assertTrue(
             Post.objects.filter(
                 text='Измененный текст',
@@ -213,9 +213,9 @@ class PostCreateFormTests(TestCase):
         )
 
         self.assertRedirects(response, reverse('post',
-                                               kwargs={'username': 'admin2', 
-                                               'post_id': 1})
-                                              )
+                                               kwargs={'username': 'admin2',
+                                              'post_id': 1})
+                                               )
         self.assertTrue(
             Post.objects.filter(
                 text='Вторично измененный текст',

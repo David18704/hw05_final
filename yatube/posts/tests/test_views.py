@@ -259,11 +259,11 @@ class FollowsTests(TestCase):
         follow_count = Follow.objects.count()
 
         response = self.authorized_client.get(reverse('profile_follow',
-                                              kwargs={'username': 'admin2'})) 
+                                              kwargs={'username': 'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
-        response = self.authorized_client.get(reverse('profile_unfollow', 
-                                              kwargs={'username': 'admin2'})) 
+        response = self.authorized_client.get(reverse('profile_unfollow',
+                                              kwargs={'username': 'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count)
 
     def test_comment(self):
@@ -293,11 +293,11 @@ class FollowsTests(TestCase):
         assert FollowsTests.user.follower.count() == 0
 
         response = self.authorized_client.get(reverse('profile_follow',
-                                                      kwargs={'username': 'admin2'})) 
+                                                      kwargs={'username': 
+                                                      'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
-        response = self.authorized_client.get(reverse
-                                             ('profile_follow',
+        response = self.authorized_client.get(reverse('profile_follow',
                                               kwargs={'username': 'admin2'})
                                               )
         self.assertEqual(Follow.objects.count(), follow_count + 1)
