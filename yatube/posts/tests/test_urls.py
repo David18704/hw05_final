@@ -3,8 +3,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.core.cache import cache
 
-from posts.models import Post, Group, User, Follow, Comment
-
+from posts.models import Post, Group, User
 from http import HTTPStatus
 
 User = get_user_model()

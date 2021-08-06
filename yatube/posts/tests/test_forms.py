@@ -62,12 +62,12 @@ class PostCreateFormTests(TestCase):
                 image='posts/small.gif'
             ).exists()
         )
-        
+
         response = self.authorized_client.get(
             reverse('profile', kwargs={'username': 'admin2'}))
 
         self.assertEqual(len(response.context['page']), 1)
-        
+
         self.assertTrue(
             Post.objects.filter(
                 text='Тестовый текст',
