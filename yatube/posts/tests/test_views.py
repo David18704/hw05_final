@@ -262,7 +262,7 @@ class FollowsTests(TestCase):
                                               kwargs={'username': 'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
-        response = self.authorized_client.get(reverse('profile_unfollow',
+        _response = self.authorized_client.get(reverse('profile_unfollow',
                                               kwargs={'username': 'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count)
 
@@ -272,7 +272,14 @@ class FollowsTests(TestCase):
             'text': 'Комментарий',
         }
 
-        response = self.authorized_client.post(reverse('add_comment',
+        response = self.guest_client.post(reverse('add_comment',
+                                          kwargs={'username': 'admin1',
+                                                  'post_id': 1}),
+                                          data=form_data,
+                                          follow=True)
+        self.assertEqual(Comment.objects.count(), comment_count)
+
+        _response = self.authorized_client.post(reverse('add_comment',
                                                kwargs={'username': 'admin1',
                                                        'post_id': 1}),
                                                data=form_data,
