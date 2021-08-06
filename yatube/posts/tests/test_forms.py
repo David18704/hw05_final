@@ -52,7 +52,7 @@ class PostCreateFormTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(PostCreateFormTests.writer_user)
 
-    def test_image_index(self):
+    def test_image(self):
         response = self.authorized_client.get(reverse('index'))
         self.assertTrue(
             Post.objects.filter(
@@ -62,11 +62,12 @@ class PostCreateFormTests(TestCase):
                 image='posts/small.gif'
             ).exists()
         )
-
-    def test_image_profile(self):
+        
         response = self.authorized_client.get(
             reverse('profile', kwargs={'username': 'admin2'}))
 
+        self.assertEqual(len(response.context['page']), 1)
+        
         self.assertTrue(
             Post.objects.filter(
                 text='Тестовый текст',
@@ -76,7 +77,6 @@ class PostCreateFormTests(TestCase):
             ).exists()
         )
 
-    def test_image_group_posts(self):
         response = self.authorized_client.get(
             reverse('group_posts', kwargs={'slug': 'test_group'}))
 
@@ -89,7 +89,6 @@ class PostCreateFormTests(TestCase):
             ).exists()
         )
 
-    def test_image_post(self):
         response = self.authorized_client.get(
             reverse('post', kwargs={'username': 'admin2', 'post_id': '1'}))
 
