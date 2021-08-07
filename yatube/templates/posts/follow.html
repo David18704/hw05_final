@@ -15,12 +15,7 @@
           Автор: {{ post.author.get_full_name }}, Дата публикации: {{ post.pub_date|date:"d M Y" }}
         </h3>
     
-        <a class="btn btn-sm btn-primary" href="{% url 'add_comment' user post.id %}" role="button">
-          Добавить комментарий
-        </a>
-        <a class="btn btn-sm btn-info" href="{% url 'post_edit' user post.id %}" role="button">          
-          Редактировать
-        </a>
+
 
         {% include "posts/post_item.html" with post=post %}
      

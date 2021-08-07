@@ -124,23 +124,20 @@ def add_comment(request, username, post_id):
             comment.post = post
             comment.author = request.user
             form.save()
-            return redirect('post', username, post_id)
+            return redirect('post', post.author, post_id)
     form = CommentForm()
     return render(request, 'posts/comments.html', {'form': form,
                                                    'post_id': post_id})
 
 
 @login_required
-def follow_index(request):
-    if (Follow.objects.filter(user=request.user).exists()):
-        post = Post.objects.filter(author__following__user=request.user)
-        paginator = Paginator(post, settings.POSTS_PER_PAGE)
-        page_number = request.GET.get('page')
-        page = paginator.get_page(page_number)
-        return render(request, 'posts/follow.html', {'page': page})
-    return render(request, 'posts/follow.html')
-
-
+def follow_index(request): 
+    post = Post.objects.filter(author__following__user=request.user)
+    paginator = Paginator(post, settings.POSTS_PER_PAGE)
+    page_number = request.GET.get('page')
+    page = paginator.get_page(page_number)
+    return render(request, 'posts/follow.html', {'page': page})
+ 
 @login_required
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
