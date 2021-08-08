@@ -238,7 +238,7 @@ class FollowsTests(TestCase):
             first_name='David',
             last_name='Elchaninov',
             username='admin2')
-        cls.non_signatory= User.objects.create(
+        cls.non_signatory = User.objects.create(
             first_name='David',
             last_name='Elchaninov',
             username='admin3')
@@ -265,10 +265,10 @@ class FollowsTests(TestCase):
         }
 
         self.guest_client.post(reverse('add_comment',
-                                kwargs={'username': 'admin1',
+                               kwargs={'username': 'admin1',
                                         'post_id': 1}),
-                                data=form_data,
-                                follow=True)
+                               data=form_data,
+                               follow=True)
         self.assertEqual(Comment.objects.count(), comment_count)
 
         self.authorized_client.post(reverse('add_comment',
@@ -277,7 +277,6 @@ class FollowsTests(TestCase):
                                     data=form_data,
                                     follow=True)
         self.assertEqual(Comment.objects.count(), comment_count + 1)
-      
 
     def test_follow(self):
         follow_count = Follow.objects.count()
@@ -289,7 +288,6 @@ class FollowsTests(TestCase):
         self.authorized_client.get(reverse('profile_unfollow',
                                    kwargs={'username': 'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count)
-
 
     def test_follow_repeat(self):
         follow_count = Follow.objects.count()
@@ -304,9 +302,8 @@ class FollowsTests(TestCase):
 
         self.authorized_client.get(reverse('profile_follow',
                                    kwargs={'username': 'admin2'})
-                                              )
+                                   )
         self.assertEqual(Follow.objects.count(), follow_count + 1)
-
 
     def test_follow_post_create(self):
 
@@ -315,14 +312,13 @@ class FollowsTests(TestCase):
         response = self.authorized_client.get(reverse('follow_index'))
         self.assertEqual(len(response.context['page'].object_list), 0)
 
-
         self.authorized_client.get(reverse('profile_follow',
                                    kwargs={'username': 'admin2'}))
         Post.objects.create(text="тест для  подписки",
                             author=FollowsTests.author),
         response = self.authorized_client.get(reverse('follow_index'))
         self.assertEqual(len(response.context['page'].object_list), 1)
-    
+
 
 @override_settings(MEDIA_ROOT='foo/bar/')
 class PostCreateImageTests(TestCase):
@@ -362,7 +358,7 @@ class PostCreateImageTests(TestCase):
     def setUp(self):
         self.authorized_client = Client()
         self.authorized_client.force_login(PostCreateImageTests.writer_user)
-    
+
     def test_image_index(self):
         self.authorized_client.get(reverse('index'))
         self.assertTrue(
@@ -373,7 +369,7 @@ class PostCreateImageTests(TestCase):
                 image='posts/small.gif'
             ).exists()
         )
-   
+
     def test_image_profile(self):
         response = self.authorized_client.get(
             reverse('profile', kwargs={'username': 'admin2'}))
@@ -388,7 +384,7 @@ class PostCreateImageTests(TestCase):
                 image='posts/small.gif'
             ).exists()
         )
-        
+
     def test_image_groupe(self):
         self.authorized_client.get(
             reverse('group_posts', kwargs={'slug': 'test_group'}))
