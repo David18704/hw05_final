@@ -54,7 +54,7 @@ def profile(request, username):
     posts = author.posts.all()
     if request.user.is_authenticated:
         following = Follow.objects.filter(user=request.user,
-                                          author=author).exists()  
+                                          author=author).exists()
     signatories = author.following.all()
     followers = author.follower.all()
     paginator = Paginator(posts, settings.POSTS_PER_PAGE)
@@ -133,6 +133,7 @@ def post_edit(request, username, post_id):
         },
     )
 
+
 @login_required
 def add_comment(request, username, post_id):
     post = get_object_or_404(Post, id=post_id)
@@ -160,7 +161,7 @@ def follow_index(request):
 @login_required
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
-    if request.user != author: 
+    if request.user != author:
         Follow.objects.get_or_create(author_id=author.id,
                                      user_id=request.user.id)
     return redirect('profile', username)
