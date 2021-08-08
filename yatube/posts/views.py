@@ -18,10 +18,16 @@ def index(request):
     paginator = Paginator(posts, settings.POSTS_PER_PAGE)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, 'posts/index.html', {'page': page,
-                  'comments': comments, 'posts': posts}
-                  )
-
+    return render(
+        request, 
+        'posts/index.html', 
+        {
+        'page': page, 
+        'comments': comments, 
+        'posts': posts,
+        },
+    )
+    
 
 @require_http_methods(['GET'])
 def group_posts(request, slug):
@@ -30,9 +36,15 @@ def group_posts(request, slug):
     paginator = Paginator(posts, settings.POSTS_PER_PAGE)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    return render(request, 'posts/group.html', {'group': group,
-                                                'posts': posts, 'page': page}
-                  )
+    return render(
+        request,
+        'posts/group.html',
+        {
+        'group': group,
+        'posts': posts, 
+        'page': page,
+        }
+    )
 
 
 @require_http_methods(['GET'])
@@ -40,36 +52,48 @@ def profile(request, username):
     following = False
     author = get_object_or_404(User, username=username)
     posts = author.posts.all()
-
     if request.user.is_authenticated:
-        if Follow.objects.filter(user=request.user, author=author):
-            following = True
-
-    signatory = author.following.all()
-    follower = author.follower.all()
+        following = Follow.objects.filter(user=request.user, author=author).exists()        
+    signatories = author.following.all()
+    followers = author.follower.all()
     paginator = Paginator(posts, settings.POSTS_PER_PAGE)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
 
-    return render(request, 'posts/profile.html',
-                  {'author': author, 'page': page, 'signatory': signatory,
-                   'follower': follower, 'following': following,
-                   'posts': posts}
-                  )
+    return render(
+        request,
+        'posts/profile.html',
+        {
+        'author': author,
+        'page': page,
+        'signatories': signatories,
+        'followers': followers,
+        'following': following,
+        'posts': posts,
+        }
+    )
 
 
 @require_http_methods(['GET'])
 def post_view(request, username, post_id):
     user = get_object_or_404(User, username=username)
-    message = get_object_or_404(Post, id=post_id, author__username=username)
+    message = get_object_or_404(Post, id=post_id, author=user)
     posts = user.posts.all()
     comments = message.comments.all()
     form = CommentForm()
-    return render(request, 'posts/post.html',
-                  {'user': user, 'message': message, 'add_comment': True,
-                   'comments': comments, 'posts': posts, 'form': form,
-                   'post_id': post_id}
-                  )
+    return render(
+        request,
+        'posts/post.html',
+        {
+        'user': user,
+        'message': message,
+        'add_comment': True,
+        'comments': comments,
+        'posts': posts,
+        'form': form,
+        'post_id': post_id,
+        }
+    )
 
 
 @require_http_methods(["GET", "POST"])
@@ -94,37 +118,32 @@ def post_edit(request, username, post_id):
     form = PostForm(request.POST or None, files=request.FILES or None,
                     instance=post)
     if form.is_valid():
-        post = form.save(commit=False)
+        post = form.save()
         post.save()
         return redirect("post", username=post.author, post_id=post_id)
-    return render(request, 'posts/new_post.html', {'form': form,
-                  'post_id': post_id, 'edit': True, 'post': post})
-
-
-def page_not_found(request, exception):
     return render(
         request,
-        "misc/404.html",
-        {"path": request.path},
-        status=404
+        'posts/new_post.html',
+        {
+        'form': form,
+        'post_id': post_id,
+        'edit': True,
+        'post': post,
+        }
     )
 
-
-def server_error(request):
-    return render(request, "misc/500.html", status=500)
 
 
 @login_required
 def add_comment(request, username, post_id):
     post = get_object_or_404(Post, id=post_id)
-    if request.method == 'POST':
-        form = CommentForm(request.POST or None)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.post = post
-            comment.author = request.user
-            form.save()
-            return redirect('post', post.author, post_id)
+    form = CommentForm(request.POST or None)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.post = post
+        comment.author = request.user
+        form.save()
+        return redirect('post', post.author, post_id)
     form = CommentForm()
     return render(request, 'posts/comments.html', {'form': form,
                                                    'post_id': post_id})
@@ -142,9 +161,8 @@ def follow_index(request):
 @login_required
 def profile_follow(request, username):
     author = get_object_or_404(User, username=username)
-    if not Follow.objects.filter(author=author, user=request.user).exists():
-        if request.user != author:
-            Follow.objects.create(author_id=author.id, user_id=request.user.id)
+    if request.user != author: 
+        Follow.objects.get_or_create(author_id=author.id, user_id=request.user.id)
     return redirect('profile', username)
 
 

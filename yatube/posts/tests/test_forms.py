@@ -52,55 +52,6 @@ class PostCreateFormTests(TestCase):
         self.authorized_client = Client()
         self.authorized_client.force_login(PostCreateFormTests.writer_user)
 
-    def test_image(self):
-        response = self.authorized_client.get(reverse('index'))
-        self.assertTrue(
-            Post.objects.filter(
-                text='Тестовый текст',
-                group=PostCreateFormTests.group.id,
-                author=PostCreateFormTests.writer_user,
-                image='posts/small.gif'
-            ).exists()
-        )
-
-        response = self.authorized_client.get(
-            reverse('profile', kwargs={'username': 'admin2'}))
-
-        self.assertEqual(len(response.context['page']), 1)
-
-        self.assertTrue(
-            Post.objects.filter(
-                text='Тестовый текст',
-                group=PostCreateFormTests.group.id,
-                author=PostCreateFormTests.writer_user,
-                image='posts/small.gif'
-            ).exists()
-        )
-
-        response = self.authorized_client.get(
-            reverse('group_posts', kwargs={'slug': 'test_group'}))
-
-        self.assertTrue(
-            Post.objects.filter(
-                text='Тестовый текст',
-                group=PostCreateFormTests.group.id,
-                author=PostCreateFormTests.writer_user,
-                image='posts/small.gif'
-            ).exists()
-        )
-
-        response = self.authorized_client.get(
-            reverse('post', kwargs={'username': 'admin2', 'post_id': '1'}))
-
-        self.assertTrue(
-            Post.objects.filter(
-                text='Тестовый текст',
-                group=PostCreateFormTests.group.id,
-                author=PostCreateFormTests.writer_user,
-                image='posts/small.gif'
-            ).exists()
-        )
-
     def test_image_new_post(self):
         posts_count = Post.objects.count()
         form_data = {

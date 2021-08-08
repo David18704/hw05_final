@@ -1,10 +1,13 @@
-from django.test import TestCase, Client
+from django.test import TestCase, Client, override_settings
 from django.urls import reverse
+from django.conf import settings
 from django import forms
 from django.core.cache import cache
-
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 from posts.models import Post, Group, User, Follow, Comment
+
+import shutil
 
 
 class GroupviewsTests(TestCase):
@@ -231,11 +234,11 @@ class FollowsTests(TestCase):
             first_name='David',
             last_name='Elchaninov',
             username='admin1')
-        cls.another_user = User.objects.create(
+        cls.author = User.objects.create(
             first_name='David',
             last_name='Elchaninov',
             username='admin2')
-        cls.another_again_user = User.objects.create(
+        cls.non_signatory= User.objects.create(
             first_name='David',
             last_name='Elchaninov',
             username='admin3')
@@ -261,53 +264,153 @@ class FollowsTests(TestCase):
             'text': 'Комментарий',
         }
 
-        response = self.guest_client.post(reverse('add_comment',
-                                          kwargs={'username': 'admin1',
-                                                  'post_id': 1}),
-                                          data=form_data,
-                                          follow=True)
+        self.guest_client.post(reverse('add_comment',
+                                kwargs={'username': 'admin1',
+                                        'post_id': 1}),
+                                data=form_data,
+                                follow=True)
         self.assertEqual(Comment.objects.count(), comment_count)
 
-        response = self.authorized_client.post(reverse('add_comment',
-                                               kwargs={'username': 'admin1',
-                                                       'post_id': 1}),
-                                               data=form_data,
-                                               follow=True)
+        self.authorized_client.post(reverse('add_comment',
+                                    kwargs={'username': 'admin1',
+                                            'post_id': 1}),
+                                    data=form_data,
+                                    follow=True)
         self.assertEqual(Comment.objects.count(), comment_count + 1)
-        self.assertEqual(response.context['post_id'], 1)   # данный ассерт
-        # применен для того, чтобы при отправке проекта на ревью обойти
-        #  проверку flake8 на неиспользуемую переменную response
+      
 
     def test_follow(self):
         follow_count = Follow.objects.count()
 
-        response = self.authorized_client.get(reverse('profile_follow',
-                                              kwargs={'username': 'admin2'}))
+        self.authorized_client.get(reverse('profile_follow',
+                                   kwargs={'username': 'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
-        response = self.authorized_client.get(reverse('profile_unfollow',
-                                              kwargs={'username': 'admin2'}))
+        self.authorized_client.get(reverse('profile_unfollow',
+                                   kwargs={'username': 'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count)
 
-        response = self.authorized_client.get(reverse('profile_follow',
-                                              kwargs={'username': 'admin1'}))
-        assert FollowsTests.user.follower.count() == 0
 
-        response = self.authorized_client.get(reverse('profile_follow',
-                                              kwargs={'username': 'admin2'}))
+    def test_follow_repeat(self):
+        follow_count = Follow.objects.count()
+
+        self.authorized_client.get(reverse('profile_follow',
+                                   kwargs={'username': 'admin1'}))
+        self.assertEqual(FollowsTests.user.follower.count(), 0)
+
+        self.authorized_client.get(reverse('profile_follow',
+                                   kwargs={'username': 'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
-        response = self.authorized_client.get(reverse('profile_follow',
-                                              kwargs={'username': 'admin2'})
+        self.authorized_client.get(reverse('profile_follow',
+                                   kwargs={'username': 'admin2'})
                                               )
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
+
+    def test_follow_post_create(self):
+
         Post.objects.create(text="тест для  подписки",
-                            author=FollowsTests.another_again_user),
+                            author=FollowsTests.non_signatory),
         response = self.authorized_client.get(reverse('follow_index'))
         self.assertEqual(len(response.context['page'].object_list), 0)
 
+
+        self.authorized_client.get(reverse('profile_follow',
+                                   kwargs={'username': 'admin2'}))
         Post.objects.create(text="тест для  подписки",
-                            author=FollowsTests.another_user),
+                            author=FollowsTests.author),
         response = self.authorized_client.get(reverse('follow_index'))
         self.assertEqual(len(response.context['page'].object_list), 1)
+    
+
+@override_settings(MEDIA_ROOT='foo/bar/')
+class PostCreateImageTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        cls.writer_user = User.objects.create_user(username='admin2')
+        cls.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test_group',
+            description='Тестирование'
+        )
+        small_gif = (
+            b'\x47\x49\x46\x38\x39\x61\x02\x00'
+            b'\x01\x00\x80\x00\x00\x00\x00\x00'
+            b'\xFF\xFF\xFF\x21\xF9\x04\x00\x00'
+            b'\x00\x00\x00\x2C\x00\x00\x00\x00'
+            b'\x02\x00\x01\x00\x00\x02\x02\x0C'
+            b'\x0A\x00\x3B'
+        )
+        uploaded = SimpleUploadedFile(
+            name='small.gif',
+            content=small_gif,
+            content_type='image/gif')
+        cls.post = Post.objects.create(
+            text='Тестовый текст',
+            author=PostCreateImageTests.writer_user,
+            group=PostCreateImageTests.group,
+            image=uploaded)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(settings.MEDIA_ROOT, ignore_errors=True)
+        super().tearDownClass()
+
+    def setUp(self):
+        self.authorized_client = Client()
+        self.authorized_client.force_login(PostCreateImageTests.writer_user)
+    
+    def test_image_index(self):
+        self.authorized_client.get(reverse('index'))
+        self.assertTrue(
+            Post.objects.filter(
+                text='Тестовый текст',
+                group=PostCreateImageTests.group.id,
+                author=PostCreateImageTests.writer_user,
+                image='posts/small.gif'
+            ).exists()
+        )
+   
+    def test_image_profile(self):
+        response = self.authorized_client.get(
+            reverse('profile', kwargs={'username': 'admin2'}))
+
+        self.assertEqual(len(response.context['page']), 1)
+
+        self.assertTrue(
+            Post.objects.filter(
+                text='Тестовый текст',
+                group=PostCreateImageTests.group.id,
+                author=PostCreateImageTests.writer_user,
+                image='posts/small.gif'
+            ).exists()
+        )
+        
+    def test_image_groupe(self):
+        self.authorized_client.get(
+            reverse('group_posts', kwargs={'slug': 'test_group'}))
+
+        self.assertTrue(
+            Post.objects.filter(
+                text='Тестовый текст',
+                group=PostCreateImageTests.group.id,
+                author=PostCreateImageTests.writer_user,
+                image='posts/small.gif'
+            ).exists()
+        )
+
+    def test_image_post(self):
+        self.authorized_client.get(
+            reverse('post', kwargs={'username': 'admin2', 'post_id': '1'}))
+
+        self.assertTrue(
+            Post.objects.filter(
+                text='Тестовый текст',
+                group=PostCreateImageTests.group.id,
+                author=PostCreateImageTests.writer_user,
+                image='posts/small.gif'
+            ).exists()
+        )

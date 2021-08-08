@@ -18,7 +18,7 @@ class StaticURLTests(TestCase):
             first_name='David',
             last_name='Elchaninov',
             username='admin1')
-        cls.user2 = User.objects.create(
+        cls.another_user = User.objects.create(
             first_name='David',
             last_name='Elchaninov',
             username='admin2')
@@ -32,7 +32,7 @@ class StaticURLTests(TestCase):
             group=StaticURLTests.group)
         cls.post2 = Post.objects.create(
             text='Тестовый текст',
-            author=StaticURLTests.user2,
+            author=StaticURLTests.another_user,
             pub_date='14.07.2021',
             group=StaticURLTests.group)
 
