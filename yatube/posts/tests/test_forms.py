@@ -158,9 +158,9 @@ class PostCreateFormTests(TestCase):
             follow=True
         )
 
-        self.assertRedirects(response, reverse('post',
-                             kwargs={'username': 'admin2',
-            'post_id': PostCreateFormTests.post.id}))
+        self.assertRedirects(response, reverse(
+                            'post',kwargs={'username': 'admin2',
+                            'post_id': PostCreateFormTests.post.id}))
         self.post.refresh_from_db()
         self.assertEqual(self.post.text, 'Вторично измененный текст')
         self.assertFalse(self.post.group)
