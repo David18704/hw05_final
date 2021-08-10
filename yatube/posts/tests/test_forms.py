@@ -137,8 +137,7 @@ class PostCreateFormTests(TestCase):
         self.assertRedirects(response, reverse('post',
                             kwargs={'username': 'admin2',
             'post_id': PostCreateFormTests.post.id}
-                                        )
-                            )
+                                        ))
 
         self.post.refresh_from_db()
         self.assertEqual(self.post.text, 'Измененный текст')
@@ -160,7 +159,7 @@ class PostCreateFormTests(TestCase):
         )
 
         self.assertRedirects(response, reverse('post',
-                            kwargs={'username': 'admin2',
+                             kwargs={'username': 'admin2',
             'post_id': PostCreateFormTests.post.id}))
         self.post.refresh_from_db()
         self.assertEqual(self.post.text, 'Вторично измененный текст')
