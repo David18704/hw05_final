@@ -138,7 +138,7 @@ class PostCreateFormTests(TestCase):
                             kwargs={'username': 'admin2',
             'post_id': PostCreateFormTests.post.id}
                                         )
-            )
+                            )
 
         self.post.refresh_from_db()
         self.assertEqual(self.post.text, 'Измененный текст')
