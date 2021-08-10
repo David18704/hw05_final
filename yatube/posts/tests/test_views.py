@@ -305,15 +305,17 @@ class FollowsTests(TestCase):
                                    )
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
-    def test_follow_post_create(self):
+    def test_follow_post_non_signatory(self):
 
         Post.objects.create(text="тест для  подписки",
                             author=FollowsTests.non_signatory),
         response = self.authorized_client.get(reverse('follow_index'))
         self.assertEqual(len(response.context['page'].object_list), 0)
 
-        self.authorized_client.get(reverse('profile_follow',
-                                   kwargs={'username': 'admin2'}))
+    def test_follow_post_author(self):
+
+        Follow.objects.create(user=FollowsTests.user, 
+                              author=FollowsTests.author),
         Post.objects.create(text="тест для  подписки",
                             author=FollowsTests.author),
         response = self.authorized_client.get(reverse('follow_index'))
