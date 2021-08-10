@@ -120,7 +120,6 @@ def post_edit(request, username, post_id):
                     instance=post)
     if form.is_valid():
         post = form.save()
-        post.save()
         return redirect("post", username=post.author, post_id=post_id)
     return render(
         request,
@@ -144,7 +143,6 @@ def add_comment(request, username, post_id):
         comment.author = request.user
         form.save()
         return redirect('post', post.author, post_id)
-    form = CommentForm()
     return render(request, 'posts/comments.html', {'form': form,
                                                    'post_id': post_id})
 

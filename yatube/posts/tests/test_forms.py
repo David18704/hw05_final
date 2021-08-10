@@ -7,11 +7,12 @@ from posts.models import Post, Group, User
 from posts.forms import PostForm
 
 import shutil
+import tempfile
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 
-@override_settings(MEDIA_ROOT='foo/bar/')
+@override_settings(MEDIA_ROOT=tempfile.mkdtemp(dir=settings.BASE_DIR))
 class PostCreateFormTests(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -121,48 +122,44 @@ class PostCreateFormTests(TestCase):
             ).exists()
         )
 
-    def test_username_post_edit_save(self):
+    def test_correct_post_edit_save(self):
         form_data = {
             'text': 'Измененный текст',
             'group': PostCreateFormTests.group.id
         }
         response = self.authorized_client.post(
-            reverse('post_edit', kwargs={'username': 'admin2', 'post_id': 1}),
+            reverse('post_edit', kwargs={'username': 'admin2',
+                    'post_id': PostCreateFormTests.post.id}),
             data=form_data,
             follow=True
         )
 
-        self.assertRedirects(response,
-                             reverse('post', kwargs={'username': 'admin2',
-                                                     'post_id': 1})
+        self.assertRedirects(response, reverse('post', 
+                             kwargs={'username': 'admin2',
+                             'post_id': PostCreateFormTests.post.id})
                              )
-        self.assertTrue(
-            Post.objects.filter(
-                text='Измененный текст',
-                group=PostCreateFormTests.group.id,
-                author=PostCreateFormTests.writer_user,
-            ).exists()
-        )
 
-    def test_another_post_edit_save(self):
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.text, 'Измененный текст')
+        self.assertEqual(self.post.group.id, PostCreateFormTests.group.id)
+        self.assertEqual(self.post.author, PostCreateFormTests.writer_user)
+
+    def test_post_edit_save_null_group(self):
         form_data = {
             'text': 'Вторично измененный текст',
             'group': ''
         }
 
         response = self.authorized_client.post(
-            reverse('post_edit', kwargs={'username': 'admin2', 'post_id': 1}),
+            reverse('post_edit', kwargs={'username': 'admin2', 'post_id': PostCreateFormTests.post.id}),
             data=form_data,
             follow=True
         )
 
         self.assertRedirects(response, reverse('post',
-                             kwargs={'username': 'admin2', 'post_id': 1})
+                             kwargs={'username': 'admin2', 'post_id': PostCreateFormTests.post.id})
                              )
-        self.assertTrue(
-            Post.objects.filter(
-                text='Вторично измененный текст',
-                author=PostCreateFormTests.writer_user,
-                group__isnull=True
-            ).exists()
-        )
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.text, 'Вторично измененный текст')
+        self.assertFalse(self.post.group)
+        self.assertEqual(self.post.author, PostCreateFormTests.writer_user)

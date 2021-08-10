@@ -24,7 +24,6 @@ class GroupviewsTests(TestCase):
         cls.post = Post.objects.create(
             text='Тестовый текст',
             author=GroupviewsTests.user,
-            pub_date='14.07.2021',
             group=GroupviewsTests.group)
 
     def setUp(self):
@@ -96,7 +95,6 @@ class GrouppagesTests(TestCase):
         cls.post = Post.objects.create(
             text='Тестовый текст',
             author=GrouppagesTests.user,
-            pub_date='14.07.2021',
             group=GrouppagesTests.group)
 
     def setUp(self):
@@ -147,7 +145,6 @@ class GrouppagesTests(TestCase):
 
         post = response.context['page'].object_list[0]
 
-        self.assertTrue(post)
         self.assertEqual(post.text, 'Тестовый текст')
         self.assertEqual(post.group.title, 'Тест')
         self.assertTrue(post.group.title != 'Тест1')
@@ -201,7 +198,6 @@ class CacheTests(TestCase):
         cls.post = Post.objects.create(
             text='Тестовый текст',
             author=CacheTests.user,
-            pub_date='14.07.2021',
             group=CacheTests.group)
 
     def setUp(self):
@@ -249,7 +245,6 @@ class FollowsTests(TestCase):
         cls.post = Post.objects.create(
             text='Тестовый текст',
             author=FollowsTests.user,
-            pub_date='14.07.2021',
             group=FollowsTests.group)
 
     def setUp(self):
@@ -278,23 +273,29 @@ class FollowsTests(TestCase):
                                     follow=True)
         self.assertEqual(Comment.objects.count(), comment_count + 1)
 
-    def test_follow(self):
+    def test_follow_author(self):
         follow_count = Follow.objects.count()
 
         self.authorized_client.get(reverse('profile_follow',
                                    kwargs={'username': 'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count + 1)
 
+    def test_unfollow_author(self):
+        follow_count = Follow.objects.count()
+
         self.authorized_client.get(reverse('profile_unfollow',
                                    kwargs={'username': 'admin2'}))
         self.assertEqual(Follow.objects.count(), follow_count)
 
-    def test_follow_repeat(self):
+    def test_follow_myself(self):
         follow_count = Follow.objects.count()
 
         self.authorized_client.get(reverse('profile_follow',
                                    kwargs={'username': 'admin1'}))
         self.assertEqual(FollowsTests.user.follower.count(), 0)
+
+    def test_follow_repeat(self):
+        follow_count = Follow.objects.count()
 
         self.authorized_client.get(reverse('profile_follow',
                                    kwargs={'username': 'admin2'}))

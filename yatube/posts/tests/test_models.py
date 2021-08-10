@@ -33,6 +33,6 @@ class GroupModelTest(TestCase):
             description="Test")
 
     def test_str_post(self):
-        test_str1 = GroupModelTest.group
-        expected_object_name = test_str1.title
-        self.assertEqual(expected_object_name, str(test_str1))
+        test_str = GroupModelTest.group
+        expected_object_name = test_str.title
+        self.assertEqual(expected_object_name, str(test_str))

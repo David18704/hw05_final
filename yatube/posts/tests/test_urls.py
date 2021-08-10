@@ -28,12 +28,10 @@ class StaticURLTests(TestCase):
         cls.post = Post.objects.create(
             text='Тестовый текст',
             author=StaticURLTests.user,
-            pub_date='14.07.2021',
             group=StaticURLTests.group)
         cls.another_post = Post.objects.create(
             text='Тестовый текст',
             author=StaticURLTests.non_authorized_user,
-            pub_date='14.07.2021',
             group=StaticURLTests.group)
 
     def setUp(self):
