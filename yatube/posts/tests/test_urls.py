@@ -60,8 +60,11 @@ class StaticURLTests(TestCase):
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
         response = self.authorized_client.get(
-            reverse('post_edit',
-            kwargs={'username': 'admin2','post_id': StaticURLTests.another_post.id})
+            reverse('post_edit', kwargs={
+                                'username': 'admin2', 
+                                'post_id': StaticURLTests.another_post.id
+                                         }
+                    )
         )
 
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
