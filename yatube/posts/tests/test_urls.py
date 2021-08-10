@@ -18,7 +18,7 @@ class StaticURLTests(TestCase):
             first_name='David',
             last_name='Elchaninov',
             username='admin1')
-        cls.another_user = User.objects.create(
+        cls.non_authorized_user = User.objects.create(
             first_name='David',
             last_name='Elchaninov',
             username='admin2')
@@ -30,9 +30,9 @@ class StaticURLTests(TestCase):
             author=StaticURLTests.user,
             pub_date='14.07.2021',
             group=StaticURLTests.group)
-        cls.post2 = Post.objects.create(
+        cls.another_post = Post.objects.create(
             text='Тестовый текст',
-            author=StaticURLTests.another_user,
+            author=StaticURLTests.non_authorized_user,
             pub_date='14.07.2021',
             group=StaticURLTests.group)
 
@@ -42,46 +42,35 @@ class StaticURLTests(TestCase):
         self.authorized_client.force_login(self.user)
         cache.clear()
 
-    def test_homepage(self):
-        response = self.guest_client.get('/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_newpage(self):
-        response = self.authorized_client.get(reverse('new_post'))
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_group(self):
-        response = self.authorized_client.get(
-            reverse('group_posts', kwargs={'slug': 'test'})
-        )
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_profile(self):
-        response = self.authorized_client.get(
-            reverse('profile', kwargs={'username': 'admin1'})
-        )
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_post(self):
-        response = self.authorized_client.get(
-            reverse('post', kwargs={'username': 'admin1', 'post_id': '1'})
-        )
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
+   
+    def test_status_code_names_correct(self):   
+        status_code_names = { 
+            'HTTPStatus.OK': '',
+            'HTTPStatus.OK': '/new/',
+            'HTTPStatus.OK': '/group/test/',
+            'HTTPStatus.OK':'/admin1/',
+            'HTTPStatus.OK':'/admin1/1/', 
+        } 
+        for HTTP_status, adress in status_code_names.items(): 
+            with self.subTest(adress=adress): 
+                response = self.authorized_client.get(adress) 
+                self.assertEqual(response.status_code, HTTPStatus.OK)
+    
     def test_post_edit(self):
         response = self.authorized_client.get(
-            reverse('post_edit', kwargs={'username': 'admin1', 'post_id': '1'})
+            reverse('post_edit', kwargs={'username': 'admin1', 'post_id': StaticURLTests.post.id})
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
         response = self.authorized_client.get(
-            reverse('post_edit', kwargs={'username': 'admin2', 'post_id': '2'})
+            reverse('post_edit', kwargs={'username': 'admin2', 'post_id': StaticURLTests.another_post.id})
         )
+
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         response = self.guest_client.get(
-            reverse('post_edit', kwargs={'username': 'admin1', 'post_id': '1'})
+            reverse('post_edit', kwargs={'username': 'admin1', 'post_id': StaticURLTests.post.id}) #тестовая запись
         )
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
-
+    
     def test_urls_uses_correct_template(self):
         templates_url_names = {
             'posts/index.html': '',
