@@ -118,7 +118,8 @@ class GrouppagesTests(TestCase):
 
     def test_username_post_edit_correct_context(self):
         response = self.authorized_client.get(
-            reverse('post_edit', kwargs={'username': 'admin1', 'post_id': GrouppagesTests.post.id }))
+            reverse('post_edit', kwargs={'username': 'admin1',
+                                         'post_id': GrouppagesTests.post.id}))
         form_data = {
 
             'text': forms.fields.CharField,
@@ -151,7 +152,7 @@ class GrouppagesTests(TestCase):
 
     def test_username_post_correct_context(self):
         response = self.authorized_client.get(
-            reverse('post', kwargs={'username': 'admin1', 'post_id': GrouppagesTests.post.id }))
+            reverse('post', kwargs={'username': 'admin1', 'post_id': GrouppagesTests.post.id}))
 
         self.assertEqual(response.context['user'].username, 'admin1')
         self.assertEqual(response.context['post_id'], GrouppagesTests.post.id)
@@ -315,7 +316,7 @@ class FollowsTests(TestCase):
 
     def test_follow_post_author(self):
 
-        Follow.objects.create(user=FollowsTests.user, 
+        Follow.objects.create(user=FollowsTests.user,
                               author=FollowsTests.author),
         Post.objects.create(text="тест для  подписки",
                             author=FollowsTests.author),
@@ -403,7 +404,8 @@ class PostCreateImageTests(TestCase):
 
     def test_image_post(self):
         self.authorized_client.get(
-            reverse('post', kwargs={'username': 'admin2', 'post_id': PostCreateImageTests.post.id}))
+            reverse('post', kwargs={'username': 'admin2', 
+                                    'post_id': PostCreateImageTests.post.id}))
 
         self.assertTrue(
             Post.objects.filter(
