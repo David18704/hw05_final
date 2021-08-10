@@ -62,8 +62,7 @@ class StaticURLTests(TestCase):
         response = self.authorized_client.get(
             reverse('post_edit', kwargs={
                 'username': 'admin2',
-                    'post_id': StaticURLTests.another_post.id
-                                                }
+                    'post_id': StaticURLTests.another_post.id}
                     )
         )
 

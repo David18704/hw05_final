@@ -136,8 +136,8 @@ class PostCreateFormTests(TestCase):
 
         self.assertRedirects(response, reverse('post',
                             kwargs={'username': 'admin2',
-                    'post_id': PostCreateFormTests.post.id}
-                                              )
+            'post_id': PostCreateFormTests.post.id}
+                                        )
             )
 
         self.post.refresh_from_db()
@@ -154,14 +154,14 @@ class PostCreateFormTests(TestCase):
         response = self.authorized_client.post(
             reverse('post_edit',
                     kwargs={'username': 'admin2',
-                            'post_id': PostCreateFormTests.post.id}),
+            'post_id': PostCreateFormTests.post.id}),
             data=form_data,
             follow=True
         )
 
         self.assertRedirects(response, reverse('post',
-                kwargs={'username': 'admin2',
-                        'post_id': PostCreateFormTests.post.id})
+                 kwargs={'username': 'admin2',
+                    'post_id': PostCreateFormTests.post.id})
                                     )
         self.post.refresh_from_db()
         self.assertEqual(self.post.text, 'Вторично измененный текст')
